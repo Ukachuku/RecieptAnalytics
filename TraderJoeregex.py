@@ -1,5 +1,13 @@
 import re
 import os
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+
+def next_available_row(worksheet):
+    str_list = list(filter(None, worksheet.col_values(1)))
+    return str(len(str_list)+1)
+
 
 os.chdir('/home/pi/gcloudstuff')
 #open ocr file to perform regex
@@ -15,8 +23,9 @@ string2 = match.group(1)
 t = string2.replace('\\', '\n')
 t1 = t.replace('\nn', '\n')
 r = t1.replace('\n', ' ')
-# extract total number of items to later validate correct number of items
-numberofitems = re.search('ITEMS [0-9][0-9]', r)
+#date of reciept
+recieptdate = re.search(r'[0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9][0-9]', r)
+recieptdate = recieptdate.group(0)
 #remove the misc information on the reciept
 itemsprice = re.search('DAILY(.*)ITEMS', r)
 itemsprice = itemsprice.group(1)
@@ -24,14 +33,39 @@ itemsprice = itemsprice.split('  ')
 #remove OZ description
 regex = re.compile(r'/OZ$')
 masterlist = list(filter(lambda i: not regex.search(i), itemsprice))
+masterlist = list(filter(None, masterlist))
 #get description of items
 itemsregex = re.compile(r'[0-9][0-9].[0-9][0-9]|[0-9].[0-9][0-9]|TOTAL|CASH|STATE TAX|SUBTOTAL')
 itemslist = list(filter(lambda i: not itemsregex.search(i), masterlist))
+#get price of items
+priceregex = re.compile(r'[a-zA-Z]')
+pricelist = list(filter(lambda i: not priceregex.search(i), masterlist))
+value = pricelist.pop(len(pricelist)-1)
+value = pricelist.pop(len(pricelist)-1)
+value = pricelist.pop(len(pricelist)-1)
 
-
-
-
-outputregex = open('outputregex.txt', 'w')
-
-outputregex.write(t1)
-outputregex.close
+#upload data into google sheet
+os.chdir('/home/pi/Downloads')
+scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+credentials = ServiceAccountCredentials.from_json_keyfile_name('glowing-thunder-261100-88aeecb27e6e.json', scope)
+gc = gspread.authorize(credentials)
+wks = gc.open("Trader Joe's PO History")
+worksheet = wks.get_worksheet(0)
+#date column
+recieptdatecolumn = []
+for i in range(len(pricelist)):
+    if i<len(pricelist):
+        recieptdatecolumn.append(recieptdate)
+    else:
+        pass
+#loop to enter all data    
+for date in range(len(recieptdatecolumn)):
+    if i<len(recieptdatecolumn):
+        next_row = next_available_row(worksheet)
+        worksheet.update_acell("A{}".format(next_row), recieptdatecolumn[date])    
+        worksheet.update_acell("B{}".format(next_row), itemslist[date])
+        worksheet.update_acell("C{}".format(next_row), pricelist[date])
+    else:
+        pass
+#close ocr file
+f.close()

@@ -25,10 +25,17 @@ cardenas <- tesseract::ocr(tifffile[1])
 #split on \n to create list
 pricelist <- stringr::str_split(cardenas, "\n")
 
-#extract right 9 digits
+#extract right 9 digits and double digit priced items
 for (i in 1:length(pricelist[[1]])) {
   pricelist[[1]][i] <- right(pricelist[[1]][i], num_char=9)
-  pricelist[[1]][i] <- grep(pattern = "\\$[0-9].[0-9][0-9]", pricelist[[1]][i], value=TRUE)
+  pricelist[[1]][i] <- stringr::str_match(string=pricelist[[1]][i], pattern="\\$[0-9][0-9].[0-9][0-9]")
+}
+#extract right and single digit priced items
+for (i in 1:length(pricelist[[1]])) {
+  pricelist[[1]][i] <- right(pricelist[[1]][i], num_char=9)
+  pricelist[[1]][i] <- stringr::str_match(string=pricelist[[1]][i], pattern="\\$[0-9][0-9].[0-9][0-9]")
 }
 
-grep(pattern = "\\$[0-9].[0-9][0-9]", pricelist[[1]][12], value=TRUE)
+# combine list
+
+#extract description of items

@@ -1,14 +1,7 @@
 library(tesseract)
 library(pdftools)
-library(stringr)
-library(qdapRegex)
 
-
-right = function(text, num_char) {
-  substr(text, nchar(text) - (num_char-1), nchar(text))
-}
-
-path <- "C:/Users/Enrique/Documents/MarketOCR"
+path <- "/home/pi/OCR"
 
 setwd(path)
 
@@ -22,20 +15,7 @@ tifffile <- list.files(pattern = "\\.tiff")
 
 cardenas <- tesseract::ocr(tifffile[1])
 
-#split on \n to create list
-pricelist <- stringr::str_split(cardenas, "\n")
 
-#extract right 9 digits and double digit priced items
-for (i in 1:length(pricelist[[1]])) {
-  pricelist[[1]][i] <- right(pricelist[[1]][i], num_char=9)
-  pricelist[[1]][i] <- stringr::str_match(string=pricelist[[1]][i], pattern="\\$[0-9][0-9].[0-9][0-9]")
-}
-#extract right and single digit priced items
-for (i in 1:length(pricelist[[1]])) {
-  pricelist[[1]][i] <- right(pricelist[[1]][i], num_char=9)
-  pricelist[[1]][i] <- stringr::str_match(string=pricelist[[1]][i], pattern="\\$[0-9][0-9].[0-9][0-9]")
-}
-
-# combine list
-
-#extract description of items
+fileConn<-file("output.txt")
+writeLines(cardenas, fileConn)
+close(fileConn)

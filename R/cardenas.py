@@ -24,3 +24,15 @@ for i in range(len(data)):
     price = price.replace(' ', '.')
     price = price.replace('$', '')
     prices.append(price)
+    
+#remove empty elements from list    
+prices = list(filter(None, prices))
+
+############## Item Description ####################
+
+#reducing text to get the first item of reciept 
+firstitem = re.sub('[^A-Za-z:\d\s]', '', data[0])
+firstitemlist = re.split('Store:[0-9][0-9] ', firstitem)
+firstitem = re.sub('[^A-Za-z\s]', '', firstitemlist[1])
+firstitem = firstitem.replace('lb', '')
+firstitem = firstitem.rstrip()

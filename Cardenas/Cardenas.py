@@ -36,3 +36,16 @@ firstitemlist = re.split('Store:[0-9][0-9] ', firstitem)
 firstitem = re.sub('[^A-Za-z\s]', '', firstitemlist[1])
 firstitem = firstitem.replace('lb', '')
 firstitem = firstitem.rstrip()
+
+#next items
+items = []
+for i in range(len(data)):
+    item=re.sub('[^A-Za-z\s]', '', data[i])
+    item=re.sub('[a-z]', '', item)
+    item=item.lstrip()
+    item=item.rstrip()
+    items.append(item)
+    
+items.pop(len(items)-1)
+items.pop(0)
+

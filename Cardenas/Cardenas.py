@@ -1,17 +1,30 @@
-import pandas as pd
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
 import os
 import re
-
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 #function to mimic excel right function
 def right(s, amount):
     return s[-amount:]
 
-os.chdir('\home\pi\OCR')
+def next_available_row(worksheet):
+    str_list = list(filter(None, worksheet.col_values(1)))
+    return str(len(str_list)+1)
+
+#os.chdir('\home\pi\OCR')
 
 #read text file from tesseract OCR in r
 file = open('output.txt', mode='r')
 #replace the newline char with space. simplify the reg expression process
 data = file.read().replace('\n', ' ')
+#Reciept Date
+Recieptdate=re.search(r'[0-9][0-9][A-Z]{3}[0-9][0-9][0-9][0-9]', data)
+Recieptdate = Recieptdate.group(0)
 #split into list from pattern on reciept. every transaction ends in 'N F' or 'T'
 data = re.split(' T |N F', data)
 #regex to extract prices and append to list
@@ -37,15 +50,42 @@ firstitem = re.sub('[^A-Za-z\s]', '', firstitemlist[1])
 firstitem = firstitem.replace('lb', '')
 firstitem = firstitem.rstrip()
 
-#next items
 items = []
+#next items
 for i in range(len(data)):
     item=re.sub('[^A-Za-z\s]', '', data[i])
     item=re.sub('[a-z]', '', item)
     item=item.lstrip()
     item=item.rstrip()
     items.append(item)
-    
+
 items.pop(len(items)-1)
 items.pop(0)
+items.insert(0, firstitem)
 
+
+scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+credentials = ServiceAccountCredentials.from_json_keyfile_name('glowing-thunder-261100-88aeecb27e6e.json', scope)
+gc = gspread.authorize(credentials)
+wks = gc.open("Cardenas_PO_History")
+worksheet = wks.get_worksheet(0)
+
+#date column
+recieptdatecolumn = []
+for i in range(len(prices)):
+    if i<len(prices):
+        recieptdatecolumn.append(Recieptdate)
+    else:
+        pass
+    
+#loop to enter all data    
+for date in range(len(recieptdatecolumn)):
+    if i<len(recieptdatecolumn):
+        next_row = next_available_row(worksheet)
+        worksheet.update_acell("A{}".format(next_row), recieptdatecolumn[date])    
+        worksheet.update_acell("B{}".format(next_row), items[date])
+        worksheet.update_acell("C{}".format(next_row), prices[date])
+    else:
+        pass
+#close ocr file
+file.close()

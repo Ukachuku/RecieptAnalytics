@@ -63,7 +63,7 @@ items.pop(len(items)-1)
 items.pop(0)
 items.insert(0, firstitem)
 
-
+#Uploading the data to gsheets
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 credentials = ServiceAccountCredentials.from_json_keyfile_name('glowing-thunder-261100-88aeecb27e6e.json', scope)
 gc = gspread.authorize(credentials)

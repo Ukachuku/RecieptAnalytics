@@ -3,7 +3,7 @@ import subprocess
 
 #define command and arguments
 command='Rscript'
-path2script='/home/pi/Downloads/RecieptAnalytics/Ralphs/RalphOCR.R'
+path2script='/home/pi/Downloads/RecieptAnalytics/OCR/tesseract.R'
 
 #build subprocess command
 cmd=[command, path2script]

@@ -16,7 +16,7 @@ def next_available_row(worksheet):
     str_list = list(filter(None, worksheet.col_values(1)))
     return str(len(str_list)+1)
 
-#os.chdir('\home\pi\OCR')
+os.chdir('//home//pi//Downloads//Marketpdf')
 
 #read text file from tesseract OCR in r
 file = open('output.txt', mode='r')

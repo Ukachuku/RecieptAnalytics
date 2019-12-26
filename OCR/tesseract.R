@@ -8,7 +8,7 @@ setwd(path)
 convertpdf <- list.files(pattern = "\\.pdf$")
 
 for (i in 1:length(convertpdf)) {
-  unlist(pdftools::pdf_convert(pdf = convertpdf[i], format = 'tiff', pages = 1, dpi = 400))
+  unlist(pdftools::pdf_convert(pdf = convertpdf[i], format = 'tiff', pages = 1, dpi = 600))
 }
 
 tifffile <- list.files(pattern = "\\.tiff")

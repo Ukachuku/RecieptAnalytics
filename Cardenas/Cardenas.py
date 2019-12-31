@@ -16,17 +16,43 @@ def next_available_row(worksheet):
     str_list = list(filter(None, worksheet.col_values(1)))
     return str(len(str_list)+1)
 
-os.chdir('//home//pi//Downloads//Marketpdf')
+os.chdir('/home/pi/Downloads/MarketPdf')
 
+'''
+if done by Google Vision
+'''
+
+#open ocr file to perform regex
+f = open('output0.txt', 'r')
+string1 = f.read()
+string1 = str(string1)
+#count n number of instances and keep last occurrence of "text: ". this is to extract the entire reciept information from the JSON file
+s=string1.count('text:')
+x = string1.replace('text:', '', s-1)
+match = re.search('text:(.*$)', x)
+string2 = match.group(1)
+#replace the newline char with space. simplify the reg expression process
+t = string2.replace('\\', '\n')
+t1 = t.replace('\nn', '\n')
+data = t1.replace('\n', ' ')
+data = data.replace('"', '')
+
+'''
+if done by Tesseract
+'''
 #read text file from tesseract OCR in r
 file = open('output.txt', mode='r')
 #replace the newline char with space. simplify the reg expression process
 data = file.read().replace('\n', ' ')
+
+
+
+
 #Reciept Date
 Recieptdate=re.search(r'[0-9][0-9][A-Z]{3}[0-9][0-9][0-9][0-9]', data)
 Recieptdate = Recieptdate.group(0)
 #split into list from pattern on reciept. every transaction ends in 'N F' or 'T'
-data = re.split(' T |N F', data)
+data = re.split(' T |N F | NF ', data)
 #regex to extract prices and append to list
 prices = []
 for i in range(len(data)):
@@ -64,6 +90,7 @@ items.pop(0)
 items.insert(0, firstitem)
 
 #Uploading the data to gsheets
+os.chdir('/home/pi/Downloads')
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 credentials = ServiceAccountCredentials.from_json_keyfile_name('glowing-thunder-261100-88aeecb27e6e.json', scope)
 gc = gspread.authorize(credentials)

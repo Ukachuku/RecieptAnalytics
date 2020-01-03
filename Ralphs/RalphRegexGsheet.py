@@ -44,7 +44,7 @@ for i in range(len(data)):
     price = right(data[i], 5)
     price = str(price)
     price = price.replace(' ', '')
-    price = re.findall('[0-9].[0-9][0-9]|[0-9][0-9].[0-9][0-9]', price)
+    price = re.findall('[0-9]\.[0-9][0-9]|[0-9][0-9]\.[0-9][0-9]', price)
     prices.append(price)
     
 #remove empty elements from list    

@@ -27,7 +27,7 @@ file = open('output.txt', mode='r')
 #replace the newline char with space. simplify the reg expression process
 #data = file.read().replace('\n', ' ')
 data = file.read()
-data = re.sub('\\\\n', ' ', data)
+data = re.sub('\n', ' ', data)
 #should not be any commas in reciept regardless of store. this will fix any ocr errors that misplaced period for a comma
 data = re.sub(pattern=',', repl='.', string=data)
 
